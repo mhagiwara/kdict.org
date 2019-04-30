@@ -5,10 +5,7 @@ WORKDIR /app/
 COPY requirements.txt /app/
 RUN pip install -r ./requirements.txt
 
-ENV LISTEN_PORT 5000
-EXPOSE 5000
-
-ENV ENVIRONMENT local
+ENV ENVIRONMENT production
 
 COPY main.py __init__.py /app/
 COPY templates /app/templates
