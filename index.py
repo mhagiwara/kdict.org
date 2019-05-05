@@ -1,64 +1,75 @@
+"""Given a CC-KEDICT file (kedict.yml), index it to ElasticSearch."""
+
+import sys
+
+import yaml
 from elasticsearch import Elasticsearch
 
-def main():
-    es = Elasticsearch()
+from main import KEDICT_INDEX
 
-    settings = {
-        'settings': {
-            'analysis': {
-                'analyzer': {
-                    'ko_analyzer': {
-                        'tokenizer': 'ko_tokenizer'
-                    }
-                },
-                'tokenizer': {
-                    'ko_tokenizer': {
-                        'type': 'ngram',
-                        'min_gram': 1,
-                        'max_gram': 2,
-                        'token_chars': [
-                            'letter',
-                            'digit'
-                        ]
-                    }
+ES_SETTINGS = {
+    'settings': {
+        'analysis': {
+            'analyzer': {
+                'ko_analyzer': {
+                    'tokenizer': 'ko_tokenizer'
                 }
-            }
-        },
-        'mappings': {
-            'properties': {
-                'word': {
-                    'type': 'text',
-                    'analyzer': 'ko_analyzer',
-                },
-                'romaja': {
-                    'type': 'text',
-                    'analyzer': 'ko_analyzer'
+            },
+            'tokenizer': {
+                'ko_tokenizer': {
+                    'type': 'ngram',
+                    'min_gram': 1,
+                    'max_gram': 2,
+                    'token_chars': [
+                        'letter',
+                        'digit'
+                    ]
                 }
             }
         }
+    },
+    'mappings': {
+        'properties': {
+            'word': {
+                'type': 'text',
+                'analyzer': 'ko_analyzer',
+            },
+            'romaja': {
+                'type': 'text',
+                'analyzer': 'ko_analyzer'
+            },
+        }
     }
+}
 
-    # es.indices.delete(index='test-index')
-    # es.indices.create(index='test-index', body=settings)
 
-    doc = {
-        'word': '가격',
-        'romaja': 'gagyeok',
-        'pos': 'n',
-        'defs' : [
-            {'def': 'monetary price'}
-        ]
-    }
-    # res = es.index(index='test-index', body=doc)
-    # print(res['result'])
+def format_entry(entry):
+    result = dict(entry)
 
-    # res = es.indices.analyze(index='test-index', body={'field': 'word', 'text': '가격'})
-    # print(res)
+    defs_all = []
+    defs = entry.get('defs', []) or []
+    for definition in defs:
+        defs_all.append(definition['def'])
+    
+    result['defs_all'] = ' '.join(defs_all)
 
-    res = es.search(index="test-index", body={"query": {"match": {"defs": "monetary"}}})
-    print("Got %d Hits:" % res['hits']['total']['value'])
-    print(res)
+    return result
+
+
+def main(kedict_path):
+    es = Elasticsearch()
+    if es.indices.exists(index=KEDICT_INDEX):
+        es.indices.delete(index=KEDICT_INDEX)
+
+    es.indices.create(index=KEDICT_INDEX, body=ES_SETTINGS)
+
+    with open(kedict_path) as f:
+        data = yaml.load(f, Loader=yaml.FullLoader)
+        for entry in data:
+            entry = format_entry(entry)
+            es.index(index=KEDICT_INDEX, body=entry)
+            print('Indexed: {}'.format(entry['word']))
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1])

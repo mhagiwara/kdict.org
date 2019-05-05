@@ -9,6 +9,8 @@ services:
       - 5000:5000
     environment:
       ENVIRONMENT: 'local'
+    networks:
+      - esnet
 
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.0.0
@@ -21,10 +23,16 @@ services:
       memlock:
         soft: -1
         hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
     networks:
       - esnet
+
+volumes:
+  esdata:
+    driver: local
 
 networks:
   esnet:
