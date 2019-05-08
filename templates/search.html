@@ -2,14 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>kdict.org - Open Source Korean-English Dictionary</title>
+    <title>kdict.org - Free Open Source Korean-English Dictionary</title>
+    <style>
+        #serp ul {
+          list-style-type: none;
+        }
+
+        .word {
+          font-size: 1.2em;
+          font-weight: bold;
+          margin-left: 4px;
+          margin-left: 4px;
+        }
+
+        .romaja {
+          font-size: 0.8em;
+          color: #666;
+          margin-left: 4px;
+          margin-left: 4px;
+        }
+
+        .defs {
+          font-size: 1em;
+          margin-left: 4px;
+          margin-left: 4px;
+        }
+    </style>
 </head>
 <body>
-    <h1>kdict.org - Open Source Korean-English Dictionary</h1>
+    <h1>kdict.org - Free Open Source Korean-English Dictionary</h1>
 
-    {% for hit in hits%}
-        {{ hit }}
-    {% endfor %}
-    <p><a href="https://github.com/mhagiwara/cc-kedict">CC-KEDICT</a> is an open-source Korean-English dictionary available under <a href="https://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike (CC BY-SA 3.0) License</a>.</p>
+    <form action="/search" method="GET">
+        <input name="q" type="text" value="{{ query }}">
+        <input type="submit" value="Search">
+    </form>
+
+    <div id="serp">
+        <ul>
+        {% for hit in hits%}
+            <li>
+                <span class="word">{{ hit['word'] }}</span>
+                <span class="romaja">{{ hit['romaja'] }}</span>
+                <span class="defs">{{ hit['defs_all'] }}</span>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+    <p>kdict.org uses the data from <a href="https://github.com/mhagiwara/cc-kedict">CC-KEDICT</a>, an open-source Korean-English dictionary available under <a href="https://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike (CC BY-SA 3.0) License</a>.</p>
 </body>
 </html>
