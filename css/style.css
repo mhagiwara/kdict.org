@@ -1,0 +1,23 @@
+#serp ul {
+  list-style-type: none;
+}
+
+.word {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-left: 4px;
+  margin-left: 4px;
+}
+
+.romaja {
+  font-size: 0.8em;
+  color: #666;
+  margin-left: 4px;
+  margin-left: 4px;
+}
+
+.defs {
+  font-size: 1em;
+  margin-left: 4px;
+  margin-left: 4px;
+}

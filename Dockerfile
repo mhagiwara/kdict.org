@@ -12,3 +12,4 @@ ENV ENVIRONMENT local
 
 COPY main.py __init__.py /app/
 COPY templates /app/templates
+COPY css /app/css

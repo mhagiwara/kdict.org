@@ -1,7 +1,7 @@
 import os
 
 from elasticsearch import Elasticsearch
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_from_directory
 
 app = Flask(__name__)
 es = Elasticsearch(['es'])
@@ -30,6 +30,10 @@ def search():
     hits.extend(hit['_source'] for hit in res['hits']['hits'])
 
     return render_template('search.html', hits=hits, query=query)
+
+@app.route('/css/<path:path>')
+def send_js(path):
+    return send_from_directory('css', path)
 
 if __name__ == '__main__':
     if os.environ['ENVIRONMENT'] == 'production':
