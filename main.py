@@ -1,7 +1,7 @@
 import os
 
 from elasticsearch import Elasticsearch
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, send_from_directory, abort
 
 app = Flask(__name__)
 es = Elasticsearch(['es'])
@@ -30,6 +30,16 @@ def search():
     hits.extend(hit['_source'] for hit in res['hits']['hits'])
 
     return render_template('search.html', hits=hits, query=query)
+
+@app.route('/word/<word_id>')
+def word(word_id):
+    res = es.search(index=KEDICT_INDEX, body={'query': {'match': {'word_id': word_id}}})
+    num_hits = res['hits']['total']['value']
+    if num_hits == 0:
+        abort(404)
+
+    entry = res['hits']['hits'][0]['_source']
+    return render_template('word.html', entry=entry)
 
 @app.route('/css/<path:path>')
 def send_js(path):

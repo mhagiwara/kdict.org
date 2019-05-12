@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div>
+    <span class="word">{{ entry['word'] }}</span>
+    <span class="romaja">{{ entry['romaja'] }}</span>
+    <span class="hanja">{{ entry['hanja'] }}</span>
+</div>
+
+<div>
+    {{ entry['pos'] }}
+</div>
+
+<ul>
+    {% for def in entry['defs'] %}
+    <li>
+        {{ def['def'] }}
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

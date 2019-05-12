@@ -10,7 +10,9 @@
     <ul>
     {% for hit in hits%}
         <li>
-            <span class="word">{{ hit['word'] }}</span>
+            <span class="word">
+                <a href="/word/{{ hit['word_id'] }}">{{ hit['word'] }}</a>
+            </span>
             <span class="romaja">{{ hit['romaja'] }}</span>
             <span class="defs">{{ hit['defs_all'] }}</span>
         </li>
