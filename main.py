@@ -46,6 +46,23 @@ def word(word_id):
     entry = res['hits']['hits'][0]['_source']
     return render_template('word.html', entry=entry)
 
+@app.route('/tag/<tag>')
+def tag(tag):
+    hits = []
+    body = {
+        'query': {
+            'match': {
+                'tags': tag
+            }
+        },
+        'size': RESULTS_PER_PAGE
+    }
+    res = es.search(index=KEDICT_INDEX, body=body)
+    hits.extend(hit['_source'] for hit in res['hits']['hits'])
+    print(res)
+
+    return render_template('search.html', hits=hits)
+
 @app.route('/css/<path:path>')
 def send_js(path):
     return send_from_directory('css', path)
