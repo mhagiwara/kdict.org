@@ -7,6 +7,7 @@ app = Flask(__name__)
 es = Elasticsearch(['es'])
 
 KEDICT_INDEX = 'kedict'
+RESULTS_PER_PAGE = 30
 
 @app.route('/health')
 def health():
@@ -20,14 +21,18 @@ def home():
 def search():
     query = request.args.get('q')
     hits = []
-    res = es.search(index=KEDICT_INDEX, body={'query': {'match': {'word': query}}})
+    body = {
+        'query': {
+            'multi_match': {
+                'query': query,
+                'fields': ['word^2', 'defs_all^2', 'romaja'],
+            }
+        },
+        'size': RESULTS_PER_PAGE
+    }
+    res = es.search(index=KEDICT_INDEX, body=body)
     hits.extend(hit['_source'] for hit in res['hits']['hits'])
-
-    res = es.search(index=KEDICT_INDEX, body={'query': {'match': {'defs_all': query}}})
-    hits.extend(hit['_source'] for hit in res['hits']['hits'])
-
-    res = es.search(index=KEDICT_INDEX, body={'query': {'match': {'romaja': query}}})
-    hits.extend(hit['_source'] for hit in res['hits']['hits'])
+    print(res)
 
     return render_template('search.html', hits=hits, query=query)
 
