@@ -40,18 +40,18 @@ def search():
     total_hits = res['hits']['total']['value']
     num_pages = math.ceil(total_hits / RESULTS_PER_PAGE)
     pagination = []
-    if current_page > 1:
-        pagination.append({'page': 'previous',
-                           'link': '/search?q={}&p={}'.format(query,
-                                                              current_page - 1)})
+    pagination.append({'page': 'previous',
+                       'link': '/search?q={}&p={}'.format(query,
+                                                          current_page - 1),
+                       'disabled': current_page == 1})
     for p in range(max(1, current_page - 4), min(num_pages, current_page + 4)+1):
         pagination.append({'page': p,
                            'link': '/search?q={}&p={}'.format(query, p),
                            'active': p == current_page})
-    if current_page < num_pages:
-        pagination.append({'page': 'next',
-                           'link': '/search?q={}&p={}'.format(query,
-                                                              current_page + 1)})
+    pagination.append({'page': 'next',
+                       'link': '/search?q={}&p={}'.format(query,
+                                                          current_page + 1),
+                       'disabled': current_page == num_pages})
 
     hits.extend(hit['_source'] for hit in res['hits']['hits'])
     print(pagination)
