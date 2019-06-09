@@ -16,6 +16,17 @@
     {% for def in entry['defs'] %}
     <li>
         {{ def['def'] }}
+        {% if 'examples' in def %}
+            <ul>
+            {% for example in def['examples'] %}
+                <li>
+                    <div>{{ example['example'] }}</div>
+                    <div class="transliteration">{{ example['transliteration'] }}</div>
+                    <div>{{ example['translation'] }}</div>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
     </li>
     {% endfor %}
 </ul>
