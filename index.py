@@ -46,7 +46,7 @@ ES_SETTINGS = {
 }
 
 
-def format_entry(entry, prev_entry):
+def format_entry(entry, prev_entry, pos_map):
     """Receive an entry from the YAML file and format it for indexing."""
     result = dict(entry)    # shallow copy
 
@@ -58,6 +58,9 @@ def format_entry(entry, prev_entry):
     else:
         word_id = entry['word']
     result['word_id'] = word_id
+
+    # unabbreviate pos
+    result['pos'] = pos_map[result['pos']]
 
     # Concat all defs for snippet
     defs_all = []
@@ -77,11 +80,14 @@ def main(kedict_path):
 
     es.indices.create(index=KEDICT_INDEX, body=ES_SETTINGS)
 
-    with open(kedict_path) as f:
+    with open(f'{kedict_path}/pos.yml') as f:
+        pos_map = yaml.load(f, Loader=yaml.FullLoader)
+
+    with open(f'{kedict_path}/kedict.yml') as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
         prev_entry = None
         for entry in data:
-            entry_formatted = format_entry(entry, prev_entry)
+            entry_formatted = format_entry(entry, prev_entry, pos_map)
             prev_entry = entry
 
             es.index(index=KEDICT_INDEX, body=entry_formatted)
