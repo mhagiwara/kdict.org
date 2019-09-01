@@ -1,7 +1,8 @@
 import os
 
 from elasticsearch import Elasticsearch
-from flask import Flask, render_template, request, send_from_directory, abort
+from flask import Flask, render_template, request, send_from_directory, abort, redirect
+from urllib.parse import urlparse, urlunparse
 import math
 
 app = Flask(__name__)
@@ -9,6 +10,16 @@ es = Elasticsearch(['es'])
 
 KEDICT_INDEX = 'kedict'
 RESULTS_PER_PAGE = 20
+
+
+@app.before_request
+def redirect_nonwww():
+    """Redirect non-www requests to www."""
+    urlparts = urlparse(request.url)
+    if urlparts.netloc == 'kdict.org':
+        urlparts_list = list(urlparts)
+        urlparts_list[1] = 'www.kdict.org'
+        return redirect(urlunparse(urlparts_list), code=301)
 
 @app.route('/health')
 def health():
